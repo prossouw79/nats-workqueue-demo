@@ -1,0 +1,16 @@
+{
+  "name": "nats-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "streaming_pub.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-nats-streaming": "^0.3.2",
+    "uuid": "^8.3.2"
+  }
+}

@@ -1,0 +1,2 @@
+config:
+  pulumi-k8s:isMinikube: "true"

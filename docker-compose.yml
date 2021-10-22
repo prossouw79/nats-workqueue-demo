@@ -1,0 +1,61 @@
+---
+version: "3.7"
+
+networks:
+  main:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+      driver: default
+
+services:
+  employer:
+    image: registry.pieterdev.com/node-nats
+    volumes:
+      - /c/Repos/nats-workqueue-js/employer.js:/app/employer.js:ro
+      - /c/Repos/nats-workqueue-js/results/:/app/results:rw
+    command: node /app/employer.js
+    environment:
+      - NATS_HOST=nats://nats-streaming:4222
+      - NATS_CLUSTER_ID=test-cluster
+      - NATS_TOPIC_JOBS=work_topic
+      - NATS_TOPIC_RESULTS=work_results
+      - NATS_QUEUE=workers
+      - NATS_CLIENT_ID=employer_pub
+    depends_on:
+      - nats-streaming
+    networks:
+      - main
+
+  nats-streaming:
+    hostname: nats-streaming
+    # command:
+    #   - -D
+    #   - -V
+    image: "nats-streaming"
+    networks:
+      - main
+    # ports:
+    #   - "4222:4222"
+    #   - "8222:8222"
+
+  worker:
+    image: registry.pieterdev.com/node-nats
+    volumes:
+      - /c/Repos/nats-workqueue-js/worker.js:/app/worker.js:ro
+    command: node /app/worker.js
+    environment:
+      - NATS_HOST=nats://nats-streaming:4222
+      - NATS_CLUSTER_ID=test-cluster
+      - NATS_TOPIC_JOBS=work_topic
+      - NATS_TOPIC_RESULTS=work_results
+      - NATS_QUEUE=workers
+      - HOPS=20
+    deploy:
+          mode: replicated
+          replicas: 20
+    depends_on:
+      - nats-streaming
+    networks:
+      - main

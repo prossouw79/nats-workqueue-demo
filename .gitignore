@@ -1,0 +1,7 @@
+graphs/*.html
+results/*.json
+node_modules
+.idea/
+.vscode/
+
+
